@@ -48,6 +48,19 @@ public enum ReconciliationRule {
         //   3. qtyDiff = |internalQty - externalQty|.
         //   4. Return true iff priceDiffPct <= priceTolerancePct AND
         //      qtyDiff <= qtyToleranceAbs.
-        throw new UnsupportedOperationException("TICKET-ADV026");
+        BigDecimal priceDiff = internalPrice.subtract(externalPrice).abs();
+        BigDecimal priceDiffPct;
+        if (internalPrice.compareTo(BigDecimal.ZERO) == 0) {
+            priceDiffPct = priceDiff.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : BigDecimal.valueOf(Double.MAX_VALUE);
+        } else {
+            priceDiffPct = priceDiff.divide(internalPrice, 10, java.math.RoundingMode.HALF_UP);
+        }
+
+        BigDecimal qtyDiff = internalQty.subtract(externalQty).abs();
+
+        boolean priceMatches = priceDiffPct.compareTo(priceTolerancePct) <= 0;
+        boolean qtyMatches = qtyDiff.compareTo(qtyToleranceAbs) <= 0;
+
+        return priceMatches && qtyMatches;
     }
 }
