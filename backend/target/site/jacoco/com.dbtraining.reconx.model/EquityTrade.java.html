@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EquityTrade.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">reconx</a> &gt; <a href="index.source.html" class="el_package">com.dbtraining.reconx.model</a> &gt; <span class="el_source">EquityTrade.java</span></div><h1>EquityTrade.java</h1><pre class="source lang-java linenums">package com.dbtraining.reconx.model;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Currency;
+import java.util.Objects;
+
+/**
+ * ============================================================================
+ * TICKET-ADV019 — EquityTrade with Builder pattern
+ *
+ * WHAT:    Concrete TradeType for equity (cash share) trades.
+ * HOW:     Final class, all fields final, no setters. Construction is via the
+ *          nested {@link Builder} which validates in {@link Builder#build()}.
+ * WHY:     Eight required fields on a single constructor is unreadable at
+ *          the call site. Builder gives named arguments, makes the validity
+ *          check a single chokepoint, and the object stays immutable.
+ * OBSERVE: Calling build() with a missing required field throws
+ *          IllegalStateException — verified by EquityTradeTest.
+ * HINT:    Same shape applied to FXTrade/BondTrade/DerivativeTrade.
+ * ============================================================================
+ *
+ * TICKET-ADV028 — equals/hashCode from tradeRef (Object methods on a regular class)
+ * TICKET-ADV030 — toString() omits PII, prints reference/symbol/qty/price/side
+ */
+public final class EquityTrade implements TradeType {
+
+    private final TradeRef tradeRef;
+    private final String instrumentSymbol;
+    private final BigDecimal quantity;
+    private final BigDecimal price;
+    private final Currency currency;
+    private final Side side;
+    private final LocalDate tradeDate;
+    private final long counterpartyId;
+
+<span class="fc" id="L37">    private EquityTrade(Builder b) {</span>
+<span class="fc" id="L38">        this.tradeRef         = b.tradeRef;</span>
+<span class="fc" id="L39">        this.instrumentSymbol = b.instrumentSymbol;</span>
+<span class="fc" id="L40">        this.quantity         = b.quantity;</span>
+<span class="fc" id="L41">        this.price            = b.price;</span>
+<span class="fc" id="L42">        this.currency         = b.currency;</span>
+<span class="fc" id="L43">        this.side             = b.side;</span>
+<span class="fc" id="L44">        this.tradeDate        = b.tradeDate;</span>
+<span class="fc" id="L45">        this.counterpartyId   = b.counterpartyId;</span>
+<span class="fc" id="L46">    }</span>
+
+<span class="fc" id="L48">    public static Builder builder() { return new Builder(); }</span>
+
+<span class="fc" id="L50">    @Override public TradeRef tradeRef()    { return tradeRef; }</span>
+<span class="nc" id="L51">    @Override public LocalDate tradeDate()  { return tradeDate; }</span>
+<span class="fc" id="L52">    @Override public AssetClass assetClass(){ return AssetClass.EQUITY; }</span>
+
+    /** Notional = quantity * price in the trade currency. */
+    @Override public Money notional() {
+        // TODO(TICKET-ADV019): return new Money(quantity * price, currency).
+<span class="fc" id="L57">        return new Money(quantity.multiply(price), currency);</span>
+    }
+
+<span class="nc" id="L60">    public String instrumentSymbol() { return instrumentSymbol; }</span>
+<span class="fc" id="L61">    public BigDecimal quantity()     { return quantity; }</span>
+<span class="fc" id="L62">    public BigDecimal price()        { return price; }</span>
+<span class="nc" id="L63">    public Currency currency()       { return currency; }</span>
+<span class="nc" id="L64">    public Side side()               { return side; }</span>
+<span class="nc" id="L65">    public long counterpartyId()     { return counterpartyId; }</span>
+
+    /** equals: two EquityTrades are equal iff their tradeRef is equal. */
+    @Override
+    public boolean equals(Object o) {
+        // TODO(TICKET-ADV028): pattern-match on EquityTrade and compare tradeRef.
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">        if (this == o) return true;</span>
+<span class="pc bpc" id="L72" title="2 of 4 branches missed.">        if (o == null || getClass() != o.getClass()) return false;</span>
+<span class="fc" id="L73">        EquityTrade that = (EquityTrade) o;</span>
+<span class="fc" id="L74">        return Objects.equals(tradeRef, that.tradeRef);</span>
+    }
+
+    @Override public int hashCode() {
+        // TODO(TICKET-ADV028): hash from tradeRef so it pairs with equals().
+<span class="fc" id="L79">        return Objects.hash(tradeRef);</span>
+    }
+
+    @Override
+    public String toString() {
+        // TODO(TICKET-ADV030): &quot;EquityTrade[ref=..., symbol=..., qty=..., price=... CCY, side=...]&quot;
+        //                     — must NOT leak counterparty PII.
+<span class="nc" id="L86">        return &quot;EquityTrade[ref=&quot; + tradeRef + &quot;, symbol=&quot; + instrumentSymbol + &quot;, qty=&quot; + quantity + &quot;, price=&quot; + price + &quot; &quot; + currency + &quot;, side=&quot; + side + &quot;]&quot;;</span>
+    }
+
+    /** Fluent builder. Required fields validated in {@link #build()}. */
+<span class="fc" id="L90">    public static final class Builder {</span>
+        private TradeRef tradeRef;
+        private String instrumentSymbol;
+        private BigDecimal quantity;
+        private BigDecimal price;
+        private Currency currency;
+        private Side side;
+        private LocalDate tradeDate;
+        private long counterpartyId;
+
+<span class="fc" id="L100">        public Builder tradeRef(TradeRef v)           { this.tradeRef = v;        return this; }</span>
+<span class="fc" id="L101">        public Builder instrumentSymbol(String v)     { this.instrumentSymbol = v; return this; }</span>
+<span class="fc" id="L102">        public Builder quantity(BigDecimal v)         { this.quantity = v;        return this; }</span>
+<span class="fc" id="L103">        public Builder price(BigDecimal v)            { this.price = v;           return this; }</span>
+<span class="fc" id="L104">        public Builder currency(Currency v)           { this.currency = v;        return this; }</span>
+<span class="fc" id="L105">        public Builder currency(String code)          { return currency(Currency.getInstance(code)); }</span>
+<span class="fc" id="L106">        public Builder side(Side v)                   { this.side = v;            return this; }</span>
+<span class="fc" id="L107">        public Builder tradeDate(LocalDate v)         { this.tradeDate = v;       return this; }</span>
+<span class="fc" id="L108">        public Builder counterpartyId(long v)         { this.counterpartyId = v;  return this; }</span>
+
+        public EquityTrade build() {
+            // TODO(TICKET-ADV019):
+            //   - Objects.requireNonNull each required field (tradeRef, instrumentSymbol,
+            //     quantity, price, currency, side, tradeDate).
+            //   - quantity and price must be &gt; 0 (IllegalStateException otherwise).
+            //   - return new EquityTrade(this).
+<span class="fc" id="L116">            Objects.requireNonNull(tradeRef, &quot;tradeRef must not be null&quot;);</span>
+<span class="fc" id="L117">            Objects.requireNonNull(instrumentSymbol, &quot;instrumentSymbol must not be null&quot;);</span>
+<span class="fc" id="L118">            Objects.requireNonNull(quantity, &quot;quantity must not be null&quot;);</span>
+<span class="fc" id="L119">            Objects.requireNonNull(price, &quot;price must not be null&quot;);</span>
+<span class="fc" id="L120">            Objects.requireNonNull(currency, &quot;currency must not be null&quot;);</span>
+<span class="fc" id="L121">            Objects.requireNonNull(side, &quot;side must not be null&quot;);</span>
+<span class="fc" id="L122">            Objects.requireNonNull(tradeDate, &quot;tradeDate must not be null&quot;);</span>
+
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">            if (quantity.compareTo(BigDecimal.ZERO) &lt;= 0) {</span>
+<span class="nc" id="L125">                throw new IllegalStateException(&quot;quantity must be greater than zero&quot;);</span>
+            }
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">            if (price.compareTo(BigDecimal.ZERO) &lt;= 0) {</span>
+<span class="nc" id="L128">                throw new IllegalStateException(&quot;price must be greater than zero&quot;);</span>
+            }
+
+<span class="fc" id="L131">            return new EquityTrade(this);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

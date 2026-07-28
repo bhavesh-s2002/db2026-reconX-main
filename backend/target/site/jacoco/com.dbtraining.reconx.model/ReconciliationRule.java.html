@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReconciliationRule.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">reconx</a> &gt; <a href="index.source.html" class="el_package">com.dbtraining.reconx.model</a> &gt; <span class="el_source">ReconciliationRule.java</span></div><h1>ReconciliationRule.java</h1><pre class="source lang-java linenums">package com.dbtraining.reconx.model;
+
+import java.math.BigDecimal;
+
+/**
+ * ============================================================================
+ * TICKET-ADV026 — ReconciliationRule enum with configurable thresholds
+ *
+ * WHAT:    Each enum value carries its own price tolerance (%) and quantity
+ *          tolerance (absolute units). {@link #matches} returns true if the
+ *          internal vs external trade pair is within tolerance.
+ * HOW:     Enum-with-state pattern — instance fields + a behaviour method.
+ * WHY:     Putting the rule on the enum keeps &quot;what is a match&quot; co-located
+ *          with the rule's name, so the reconciliation engine is just:
+ *          `if (rule.matches(internal, external)) ... matched ...`.
+ * OBSERVE: PRICE_TOLERANCE_1PCT.matches(p, p*1.005) is true; *1.02 is false.
+ * ============================================================================
+ */
+<span class="fc" id="L19">public enum ReconciliationRule {</span>
+
+<span class="fc" id="L21">    EXACT(BigDecimal.ZERO, BigDecimal.ZERO),</span>
+<span class="fc" id="L22">    PRICE_TOLERANCE_1PCT(new BigDecimal(&quot;0.01&quot;), BigDecimal.ZERO),</span>
+<span class="fc" id="L23">    PRICE_TOLERANCE_50BPS(new BigDecimal(&quot;0.005&quot;), BigDecimal.ZERO),</span>
+<span class="fc" id="L24">    QTY_TOLERANCE_5UNITS(BigDecimal.ZERO, new BigDecimal(&quot;5&quot;)),</span>
+<span class="fc" id="L25">    LOOSE(new BigDecimal(&quot;0.05&quot;), new BigDecimal(&quot;10&quot;));</span>
+
+    private final BigDecimal priceTolerancePct;
+    private final BigDecimal qtyToleranceAbs;
+
+<span class="fc" id="L30">    ReconciliationRule(BigDecimal priceTolerancePct, BigDecimal qtyToleranceAbs) {</span>
+<span class="fc" id="L31">        this.priceTolerancePct = priceTolerancePct;</span>
+<span class="fc" id="L32">        this.qtyToleranceAbs   = qtyToleranceAbs;</span>
+<span class="fc" id="L33">    }</span>
+
+<span class="nc" id="L35">    public BigDecimal priceTolerancePct() { return priceTolerancePct; }</span>
+<span class="nc" id="L36">    public BigDecimal qtyToleranceAbs()   { return qtyToleranceAbs; }</span>
+
+    /**
+     * Decide whether two prices/quantities are within this rule's tolerance.
+     * @return true if BOTH the price diff (as %) AND the qty diff (as abs)
+     *         are within tolerance.
+     */
+    public boolean matches(BigDecimal internalPrice, BigDecimal internalQty,
+                           BigDecimal externalPrice, BigDecimal externalQty) {
+        // TODO(TICKET-ADV026):
+        //   1. Compute |internalPrice - externalPrice| as priceDiff.
+        //   2. priceDiffPct = priceDiff / internalPrice (guard divide-by-zero).
+        //   3. qtyDiff = |internalQty - externalQty|.
+        //   4. Return true iff priceDiffPct &lt;= priceTolerancePct AND
+        //      qtyDiff &lt;= qtyToleranceAbs.
+<span class="fc" id="L51">        BigDecimal priceDiff = internalPrice.subtract(externalPrice).abs();</span>
+        BigDecimal priceDiffPct;
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        if (internalPrice.compareTo(BigDecimal.ZERO) == 0) {</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">            priceDiffPct = priceDiff.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : BigDecimal.valueOf(Double.MAX_VALUE);</span>
+        } else {
+<span class="fc" id="L56">            priceDiffPct = priceDiff.divide(internalPrice, 10, java.math.RoundingMode.HALF_UP);</span>
+        }
+
+<span class="fc" id="L59">        BigDecimal qtyDiff = internalQty.subtract(externalQty).abs();</span>
+
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        boolean priceMatches = priceDiffPct.compareTo(priceTolerancePct) &lt;= 0;</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        boolean qtyMatches = qtyDiff.compareTo(qtyToleranceAbs) &lt;= 0;</span>
+
+<span class="fc bfc" id="L64" title="All 4 branches covered.">        return priceMatches &amp;&amp; qtyMatches;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

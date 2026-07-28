@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseHealthIndicator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">reconx</a> &gt; <a href="index.source.html" class="el_package">com.dbtraining.reconx.observability</a> &gt; <span class="el_source">DatabaseHealthIndicator.java</span></div><h1>DatabaseHealthIndicator.java</h1><pre class="source lang-java linenums">package com.dbtraining.reconx.observability;
+
+import org.springframework.boot.actuate.health.AbstractHealthIndicator;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.stereotype.Component;
+
+import javax.sql.DataSource;
+
+/**
+ * ============================================================================
+ * TICKET-ADV059 — DatabaseHealthIndicator (timed SELECT 1)
+ *
+ * WHAT:    Custom actuator HealthIndicator that runs a fast `SELECT 1` with
+ *          a 2-second timeout and reports latencyMs as a detail.
+ * HOW:     Extends AbstractHealthIndicator; Spring picks it up by bean name
+ *          and exposes it under /actuator/health/database.
+ * WHY:     The default DataSource health indicator works, but a custom one
+ *          gives us a controllable timeout AND visible latency for SRE
+ *          dashboards.
+ * OBSERVE: GET /api/actuator/health/database -&gt; `{&quot;status&quot;:&quot;UP&quot;,
+ *          &quot;details&quot;:{&quot;latencyMs&quot;: &lt;number&gt;}}`.
+ * ============================================================================
+ *
+ *  TODO(TICKET-ADV059):
+ *    long start = System.nanoTime();
+ *    try (Connection c = ds.getConnection(); Statement s = c.createStatement()) {
+ *        s.setQueryTimeout(2);
+ *        s.execute(&quot;SELECT 1&quot;);
+ *        builder.up().withDetail(&quot;latencyMs&quot;, (System.nanoTime() - start) / 1_000_000);
+ *    }
+ *
+ *  HINT: Throw any exception out of this method — AbstractHealthIndicator
+ *        converts it to DOWN with the exception class as a detail.
+ * ============================================================================
+ */
+@Component(&quot;database&quot;)
+public class DatabaseHealthIndicator extends AbstractHealthIndicator {
+
+    private final DataSource ds;
+
+<span class="fc" id="L41">    public DatabaseHealthIndicator(DataSource ds) { this.ds = ds; }</span>
+
+    @Override
+    protected void doHealthCheck(Health.Builder builder) throws Exception {
+        // TODO(TICKET-ADV059): run `SELECT 1` with a 2s timeout and record latencyMs.
+<span class="nc" id="L46">        builder.up();</span>
+<span class="nc" id="L47">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

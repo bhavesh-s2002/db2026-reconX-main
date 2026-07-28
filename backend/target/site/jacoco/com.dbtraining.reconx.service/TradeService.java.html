@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TradeService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">reconx</a> &gt; <a href="index.source.html" class="el_package">com.dbtraining.reconx.service</a> &gt; <span class="el_source">TradeService.java</span></div><h1>TradeService.java</h1><pre class="source lang-java linenums">package com.dbtraining.reconx.service;
+
+import com.dbtraining.reconx.dto.TradeRequest;
+import com.dbtraining.reconx.exception.DuplicateTradeRefException;
+import com.dbtraining.reconx.exception.TradeNotFoundException;
+import com.dbtraining.reconx.kafka.TradeEventProducer;
+import com.dbtraining.reconx.observability.TradeMetrics;
+import com.dbtraining.reconx.repository.CounterpartyRepository;
+import com.dbtraining.reconx.repository.InstrumentRepository;
+import com.dbtraining.reconx.repository.TradeRepository;
+import com.dbtraining.reconx.repository.entity.Trade;
+import com.dbtraining.reconx.dto.TradeEvent;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.UUID;
+
+import static com.dbtraining.reconx.repository.TradeSpecifications.*;
+
+/**
+ * ============================================================================
+ * TICKET-ADV064 — TradeService.create (POST endpoint backing)
+ * TICKET-ADV065 — update
+ * TICKET-ADV066 — updateStatus (PATCH)
+ * TICKET-ADV067 — softDelete
+ * TICKET-ADV083 — increments trade_created_total Counter on create
+ * TICKET-ADV129 — publishes TradeEvent on every state change
+ * TICKET-ADV055/ADV056 — list() uses Specifications + filter query
+ * ============================================================================
+ */
+@Service
+@Transactional
+public class TradeService {
+
+    private final TradeRepository tradeRepo;
+    private final CounterpartyRepository cpRepo;
+    private final InstrumentRepository instRepo;
+    private final TradeEventProducer events;
+    private final TradeMetrics metrics;
+
+    public TradeService(TradeRepository tradeRepo,
+                        CounterpartyRepository cpRepo,
+                        InstrumentRepository instRepo,
+                        TradeEventProducer events,
+<span class="fc" id="L50">                        TradeMetrics metrics) {</span>
+<span class="fc" id="L51">        this.tradeRepo = tradeRepo;</span>
+<span class="fc" id="L52">        this.cpRepo = cpRepo;</span>
+<span class="fc" id="L53">        this.instRepo = instRepo;</span>
+<span class="fc" id="L54">        this.events = events;</span>
+<span class="fc" id="L55">        this.metrics = metrics;</span>
+<span class="fc" id="L56">    }</span>
+
+    public Trade create(TradeRequest req, String actor) {
+        // TODO(TICKET-ADV064): reject duplicate tradeRef via DuplicateTradeRefException,
+        //   build a new Trade with instrument + counterparty looked up from
+        //   their repos (throw TradeNotFoundException on miss), status = &quot;PENDING&quot;,
+        //   save, then:
+        //     - metrics.incrementTradeCreated() + metrics.recordTradeValue(qty*price) — TICKET-ADV083
+        //     - events.publish(new TradeEvent(... TRADE_CREATED ... actor ...)) — TICKET-ADV129
+<span class="nc" id="L65">        throw new UnsupportedOperationException(&quot;TICKET-ADV064&quot;);</span>
+    }
+
+    public Trade update(Long id, TradeRequest req, String actor) {
+        // TODO(TICKET-ADV065): load by id (throw TradeNotFoundException if missing),
+        //   copy mutable fields from req, save, publish a TRADE_UPDATED event.
+<span class="nc" id="L71">        throw new UnsupportedOperationException(&quot;TICKET-ADV065&quot;);</span>
+    }
+
+    public Trade updateStatus(Long id, String status, String actor) {
+        // TODO(TICKET-ADV066): load, setStatus(status), save, publish TRADE_UPDATED
+        //   with the new status in the &quot;after&quot; slot of the event.
+<span class="nc" id="L77">        throw new UnsupportedOperationException(&quot;TICKET-ADV066&quot;);</span>
+    }
+
+    public void softDelete(Long id, String actor) {
+        // TODO(TICKET-ADV067): load, call t.softDelete() (sets deleted_at), save,
+        //   publish a TRADE_CANCELLED event.
+<span class="nc" id="L83">        throw new UnsupportedOperationException(&quot;TICKET-ADV067&quot;);</span>
+    }
+
+    @Transactional(readOnly = true)
+    public Page&lt;Trade&gt; list(LocalDate from, LocalDate to, String status, Long counterpartyId, Pageable pageable) {
+        // TODO(TICKET-ADV055 + TICKET-ADV056): combine the static helpers from
+        //   TradeSpecifications (hasStatus, tradeDateBetween, hasCounterparty)
+        //   via Specification.where(...).and(...) and call
+        //   tradeRepo.findAll(spec, pageable). Until JPA is in place, throw.
+<span class="nc" id="L92">        throw new UnsupportedOperationException(&quot;TICKET-ADV055&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

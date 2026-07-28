@@ -1,3 +1,4 @@
+com\dbtraining\reconx\repository\ReconResultRepository.class
 com\dbtraining\reconx\service\TradeAnalyticsService$NotionalSummary.class
 com\dbtraining\reconx\dto\ReconRunRequest.class
 com\dbtraining\reconx\controller\AuditController.class
@@ -23,8 +24,11 @@ com\dbtraining\reconx\observability\DatabaseHealthIndicator.class
 com\dbtraining\reconx\security\JwtTokenProvider.class
 com\dbtraining\reconx\kafka\ReconciliationConsumer.class
 com\dbtraining\reconx\model\BondTrade$Builder.class
+com\dbtraining\reconx\service\ReconciliationService.class
+com\dbtraining\reconx\service\ReconSummary.class
 com\dbtraining\reconx\controller\TradeController.class
 com\dbtraining\reconx\model\EquityTrade.class
+com\dbtraining\reconx\service\ReconSummaryCollector.class
 com\dbtraining\reconx\model\TradeType.class
 com\dbtraining\reconx\repository\entity\AppUser.class
 com\dbtraining\reconx\repository\TradeRepository.class
@@ -60,10 +64,12 @@ com\dbtraining\reconx\security\SecurityConfig.class
 com\dbtraining\reconx\model\FXTrade.class
 com\dbtraining\reconx\repository\ReconBreakRepository.class
 com\dbtraining\reconx\exception\ReconException.class
+com\dbtraining\reconx\service\TradeLookupService.class
 com\dbtraining\reconx\repository\AppUserRepository.class
 com\dbtraining\reconx\repository\entity\ReconBreak.class
 com\dbtraining\reconx\dto\TradeRequest.class
 com\dbtraining\reconx\repository\CounterpartyRepository.class
+com\dbtraining\reconx\service\ReconSummary$Builder.class
 com\dbtraining\reconx\service\ReconciliationEngine.class
 com\dbtraining\reconx\repository\entity\Counterparty.class
 com\dbtraining\reconx\service\TradeService.class

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">reconx</a> &gt; <a href="index.source.html" class="el_package">com.dbtraining.reconx.exception</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.dbtraining.reconx.exception;
+
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.stream.Collectors;
+
+/**
+ * ============================================================================
+ * TICKET-ADV062 — RFC 7807 ProblemDetail for every ReconException
+ *
+ * Maps each domain exception subtype to the right HTTP status, with a
+ * structured ProblemDetail body so clients don't have to parse free text.
+ * ============================================================================
+ */
+@RestControllerAdvice
+<span class="fc" id="L21">public class GlobalExceptionHandler {</span>
+
+    @ExceptionHandler(TradeNotFoundException.class)
+    public ProblemDetail notFound(TradeNotFoundException ex) {
+        // TODO(TICKET-ADV062): return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+<span class="nc" id="L26">        throw new UnsupportedOperationException(&quot;TICKET-ADV062&quot;);</span>
+    }
+
+    @ExceptionHandler(DuplicateTradeRefException.class)
+    public ProblemDetail duplicate(DuplicateTradeRefException ex) {
+        // TODO(TICKET-ADV062): map DuplicateTradeRefException -&gt; HttpStatus.CONFLICT (409).
+<span class="nc" id="L32">        throw new UnsupportedOperationException(&quot;TICKET-ADV062&quot;);</span>
+    }
+
+    @ExceptionHandler(InvalidTradeException.class)
+    public ProblemDetail invalid(InvalidTradeException ex) {
+        // TODO(TICKET-ADV062): map InvalidTradeException -&gt; HttpStatus.BAD_REQUEST (400).
+<span class="nc" id="L38">        throw new UnsupportedOperationException(&quot;TICKET-ADV062&quot;);</span>
+    }
+
+    @ExceptionHandler(ReconciliationMismatchException.class)
+    public ProblemDetail mismatch(ReconciliationMismatchException ex) {
+        // TODO(TICKET-ADV062): map ReconciliationMismatchException -&gt; HttpStatus.UNPROCESSABLE_ENTITY (422).
+<span class="nc" id="L44">        throw new UnsupportedOperationException(&quot;TICKET-ADV062&quot;);</span>
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ProblemDetail validation(MethodArgumentNotValidException ex) {
+        // TODO(TICKET-ADV062): join field errors (&quot;field: message; ...&quot;) and return BAD_REQUEST ProblemDetail.
+        //   Hint: ex.getBindingResult().getFieldErrors().stream().map(...).collect(Collectors.joining(&quot;; &quot;))
+<span class="nc" id="L51">        throw new UnsupportedOperationException(&quot;TICKET-ADV062&quot;);</span>
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ProblemDetail constraint(ConstraintViolationException ex) {
+        // TODO(TICKET-ADV062): map ConstraintViolationException -&gt; HttpStatus.BAD_REQUEST (400).
+<span class="nc" id="L57">        throw new UnsupportedOperationException(&quot;TICKET-ADV062&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
