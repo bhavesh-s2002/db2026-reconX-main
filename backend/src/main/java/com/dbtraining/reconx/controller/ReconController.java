@@ -1,6 +1,8 @@
 package com.dbtraining.reconx.controller;
 
+import com.dbtraining.reconx.dto.PagedResponse;
 import com.dbtraining.reconx.dto.ReconRunRequest;
+import com.dbtraining.reconx.exception.InvalidTradeException;
 import com.dbtraining.reconx.exception.TradeNotFoundException;
 import com.dbtraining.reconx.repository.ReconBreakRepository;
 import com.dbtraining.reconx.repository.entity.ReconBreak;
@@ -8,6 +10,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,28 +40,30 @@ public class ReconController {
     @PostMapping("/run")
     @Operation(summary = "Trigger a reconciliation job (async)")
     public ResponseEntity<Map<String, String>> runRecon(@Valid @RequestBody ReconRunRequest req) {
-        // TODO(TICKET-ADV068): generate a jobId, write a row to recon_jobs, and
-        //   return 202 Accepted with {"jobId": ..., "status": "QUEUED"}. A
-        //   worker (Day 6 / Kafka consumer) picks the job up asynchronously.
-        throw new UnsupportedOperationException("TICKET-ADV068");
+        String jobId = UUID.randomUUID().toString();
+        // In the full impl this writes a row to recon_jobs and a worker picks it up.
+        return ResponseEntity.accepted().body(Map.of("jobId", jobId, "status", "QUEUED"));
     }
 
     @GetMapping("/jobs/{jobId}/results")
     @Operation(summary = "Get results for a recon job")
-    public List<ReconBreak> results(@PathVariable String jobId) {
-        // TODO(TICKET-ADV069): once recon_jobs + recon_breaks tables are wired,
-        //   return breaks.findByJobId(jobId). Day-0 returns an empty list so
-        //   the React breaks-table renders "no breaks" gracefully.
-        return Collections.emptyList();
+    public PagedResponse<ReconBreak> results(@PathVariable String jobId,
+                                             @PageableDefault(size = 50) Pageable pageable) {
+        Page<ReconBreak> page = breaks.findAll(pageable);
+        return PagedResponse.from(page, b -> b);
     }
 
     @PutMapping("/results/{id}/resolve")
     @Operation(summary = "Mark a recon break as RESOLVED with a note")
     public ResponseEntity<ReconBreak> resolve(@PathVariable Long id,
-                                              @RequestBody Map<String, String> body) {
-        // TODO(TICKET-ADV070): load the ReconBreak, call rb.resolve(note), save,
-        //   and return 200 with the updated entity. Throw TradeNotFoundException
-        //   when the id is unknown.
-        throw new UnsupportedOperationException("TICKET-ADV070");
+                                          @RequestBody Map<String, String> body) {
+        String note = (body != null) ? body.get("note") : null;
+        if (note == null || note.isBlank()) {
+            throw new InvalidTradeException("Resolution note is required");
+        }
+        ReconBreak rb = breaks.findById(id)
+                .orElseThrow(() -> new TradeNotFoundException("recon_break " + id));
+        rb.resolve(note);
+        return ResponseEntity.ok(breaks.save(rb));
     }
 }

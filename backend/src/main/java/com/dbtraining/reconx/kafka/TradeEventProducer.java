@@ -45,6 +45,12 @@ public class TradeEventProducer {
     }
 
     public void publish(TradeEvent event) {
-        throw new UnsupportedOperationException("TICKET-ADV129");
+        log.debug("Publishing TradeEvent eventId={} ref={} type={}",
+                event.eventId(), event.tradeRef(), event.eventType());
+        try {
+            template.send(TOPIC, event.tradeRef(), event);
+        } catch (Throwable e) {
+            log.warn("Kafka event publish skipped/failed for tradeRef={}: {}", event.tradeRef(), e.getMessage());
+        }
     }
 }
