@@ -6,6 +6,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -39,6 +41,8 @@ import java.util.UUID;
 @Order(1)
 public class MdcFilter implements Filter {
 
+    private static final Logger log = LoggerFactory.getLogger(MdcFilter.class);
+
     static final String HDR_CORRELATION = "X-Correlation-Id";
     static final String HDR_TRADE_REF   = "X-Trade-Ref";
 
@@ -51,6 +55,7 @@ public class MdcFilter implements Filter {
         try {
             MDC.put("correlationId", correlationId);
             if (tradeRef != null) MDC.put("tradeRef", tradeRef);
+            log.info("Incoming HTTP {} {}", http.getMethod(), http.getRequestURI());
             chain.doFilter(req, res);
         } finally {
             MDC.clear();
