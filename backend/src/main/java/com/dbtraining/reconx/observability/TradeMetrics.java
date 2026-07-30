@@ -26,7 +26,7 @@ public class TradeMetrics {
                         ReconBreakRepository breakRepo,
                         TradeRepository tradeRepo) {
 
-        this.tradeCreated = Counter.builder("my_test_counter")
+        this.tradeCreated = Counter.builder("trade_created")
                 .description("Total trades created")
                 .register(registry);
 
