@@ -25,6 +25,7 @@ public class InstrumentService {
         //   .orElseThrow(() -> new InvalidTradeException("Unknown instrument symbol: " + symbol)).
         //   The @Cacheable annotation above is what makes the second call cheap —
         //   verify the cache hit-rate via /actuator/caches once you wire this up.
-        throw new UnsupportedOperationException("TICKET-ADV081");
+        return repo.findBySymbol(symbol)
+                .orElseThrow(() -> new InvalidTradeException("Unknown instrument symbol: " + symbol));
     }
 }
