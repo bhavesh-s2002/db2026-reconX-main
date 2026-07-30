@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <title>ReconX — Trades</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Theme before paint -->
+    <script>
+        (function () {
+            const saved = localStorage.getItem('reconx-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="app-shell">
+
+<header class="app-header">
+
+    <h1 class="layout__title">ReconX</h1>
+
+    <nav class="layout__nav" aria-label="Main navigation">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="trades.html" aria-current="page">Trades</a>
+        <a href="recon.html">Recon</a>
+    </nav>
+
+    <button
+            id="theme-toggle"
+            aria-label="Toggle light/dark theme"
+            aria-pressed="false">
+        🌗
+    </button>
+
+</header>
+
+<div class="app-body">
+
+    <aside class="app-sidebar">
+
+        <h2>Quick Filters</h2>
+
+        <ul>
+            <li><a href="#">All Trades</a></li>
+            <li><a href="#">Matched</a></li>
+            <li><a href="#">Pending</a></li>
+            <li><a href="#">Breaks</a></li>
+        </ul>
+
+    </aside>
+
+    <main class="app-main">
+
+        <section>
+
+            <h2>Trades</h2>
+
+            <div class="table-scroll">
+
+                <table class="data-table" id="trades-table">
+
+                    <thead>
+
+                    <tr>
+
+                        <th data-col="tradeRef">
+                            Trade Ref
+                            <span class="resize-handle"></span>
+                        </th>
+
+                        <th data-col="symbol">
+                            Instrument
+                            <span class="resize-handle"></span>
+                        </th>
+
+                        <th data-col="quantity" data-type="number">
+                            Quantity
+                            <span class="resize-handle"></span>
+                        </th>
+
+                        <th data-col="price" data-type="number">
+                            Price
+                            <span class="resize-handle"></span>
+                        </th>
+
+                        <th data-col="status">
+                            Status
+                            <span class="resize-handle"></span>
+                        </th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody id="trades-tbody">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<footer class="app-footer">
+    <small>ReconX TDI 2026 · Trades</small>
+</footer>
+
+<script src="js/theme.js"></script>
+<script src="js/trades.js"></script>
+
+</body>
+</html>
