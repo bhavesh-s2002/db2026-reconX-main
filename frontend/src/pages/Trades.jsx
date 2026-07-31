@@ -1,7 +1,8 @@
 // Compound DataTable + useDebouncedSearch driving a paginated trades list.
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { withAuth } from '@components/withAuth.jsx';
 import DataTable from '@components/DataTable.jsx';
+import TradeRow from '@components/TradeRow.jsx';
 import { useDebouncedSearch } from '@hooks/useDebouncedSearch.js';
 import { api } from '@services/apiService.js';
 
@@ -9,7 +10,13 @@ function Trades() {
   const [search, setSearch] = useState('');
   const debounced = useDebouncedSearch(search, 300);
   const [page, setPage] = useState(0);
+  const [selectedId, setSelectedId] = useState(null);
   const [data, setData] = useState({ items: [], totalPages: 0 });
+
+  // Reference-stable callback across renders to prevent unnecessary TradeRow re-renders
+  const handleSelect = useCallback((id) => {
+    setSelectedId(id);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -37,7 +44,7 @@ function Trades() {
 
   return (
     <section>
-      <h2>Trades</h2>
+      <h2>Trades {selectedId && <span>(Selected: #{selectedId})</span>}</h2>
       <input
         aria-label="Filter by status"
         placeholder="status filter (PENDING/MATCHED/…)"
@@ -47,21 +54,15 @@ function Trades() {
       <DataTable>
         <DataTable.Header columns={[
           { key: 'tradeRef', label: 'Ref' },
-          { key: 'symbol',   label: 'Symbol' },
-          { key: 'qty',      label: 'Qty' },
-          { key: 'price',    label: 'Price' },
-          { key: 'status',   label: 'Status' },
+          { key: 'instrument', label: 'Instrument' },
+          { key: 'quantity', label: 'Qty' },
+          { key: 'price', label: 'Price' },
+          { key: 'status', label: 'Status' },
         ]} />
         <DataTable.Body
           rows={data.items}
           render={(t) => (
-            <>
-              <span>{t.tradeRef}</span>
-              <span>{t.symbol ?? t.instrument}</span>
-              <span>{t.qty ?? t.quantity}</span>
-              <span>{t.price}</span>
-              <span>{t.status}</span>
-            </>
+            <TradeRow key={t.id} trade={t} onClick={handleSelect} />
           )}
         />
         <DataTable.Pagination
@@ -75,3 +76,4 @@ function Trades() {
 }
 
 export default withAuth(Trades);
+
