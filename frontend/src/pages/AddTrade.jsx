@@ -44,7 +44,11 @@ function AddTrade() {
   async function onSubmit(values) {
     setServerError(null);
     try {
-      await api.createTrade(values);
+      const formatted = {
+        ...values,
+        tradeDate: values.tradeDate ? new Date(values.tradeDate).toISOString().split('T')[0] : '',
+      };
+      await api.createTrade(formatted);
       reset();
     } catch (err) {
       setServerError(err.message || 'Failed to create trade');

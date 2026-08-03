@@ -47,10 +47,14 @@ public class TradeEventProducer {
     public void publish(TradeEvent event) {
         log.debug("Publishing TradeEvent eventId={} ref={} type={}",
                 event.eventId(), event.tradeRef(), event.eventType());
-        try {
-            template.send(TOPIC, event.tradeRef(), event);
-        } catch (Throwable e) {
-            log.warn("Kafka event publish skipped/failed for tradeRef={}: {}", event.tradeRef(), e.getMessage());
-        }
+        template.send(TOPIC, event.tradeRef(), event)
+                .whenComplete((result, ex) -> {
+                    if (ex != null) {
+                        log.warn("Kafka event publish skipped/failed for tradeRef={}: {}", event.tradeRef(), ex.getMessage());
+                    } else if (result != null) {
+                        log.debug("Published TradeEvent eventId={} to partition={} offset={}",
+                                event.eventId(), result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
+                    }
+                });
     }
 }

@@ -10,7 +10,7 @@ function TradeRowImpl({ trade, onClick }) {
       role="row"
     >
       <span className="trade-cell">{trade.tradeRef}</span>
-      <span className="trade-cell">{trade.instrument ?? trade.symbol}</span>
+      <span className="trade-cell">{trade.instrumentSymbol ?? trade.instrumentId ?? trade.instrument ?? trade.symbol ?? '-'}</span>
       <span className="trade-cell">{trade.quantity ?? trade.qty}</span>
       <span className="trade-cell">{trade.price}</span>
       <span className="trade-cell">

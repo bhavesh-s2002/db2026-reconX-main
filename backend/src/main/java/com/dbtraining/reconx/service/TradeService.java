@@ -162,6 +162,8 @@ public class TradeService {
                 .where(tradeDateBetween(from, to))
                 .and(hasStatus(status))
                 .and(hasCounterparty(counterpartyId));
-        return tradeRepo.findAll(spec, pageable);
+        Page<Trade> page = tradeRepo.findAll(spec, pageable);
+        page.forEach(TradeService::initLazyRelations);
+        return page;
     }
 }
