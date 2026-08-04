@@ -1,6 +1,7 @@
 target/
 *.class
 *.jar
+!backend/lib/*.jar
 *.war
 *.ear
 *.log
