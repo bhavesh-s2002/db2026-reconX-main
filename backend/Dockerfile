@@ -12,9 +12,15 @@ WORKDIR /workspace
 COPY pom.xml .
 COPY mvnw .
 COPY .mvn .mvn
+COPY lib lib
 
-# Make Maven wrapper executable
-RUN chmod +x mvnw
+# Make Maven wrapper executable and convert CRLF to LF for Linux
+RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
+
+# Install custom local starter dependency
+RUN ./mvnw -B install:install-file \
+    -Dfile=lib/recon-audit-starter-1.0.0.jar \
+    -DpomFile=lib/recon-audit-starter-1.0.0.pom
 
 # Download dependencies
 RUN ./mvnw -q -B dependency:go-offline || true

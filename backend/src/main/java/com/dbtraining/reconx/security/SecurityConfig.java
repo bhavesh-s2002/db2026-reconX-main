@@ -40,7 +40,7 @@ public class SecurityConfig {
           .csrf(AbstractHttpConfigurer::disable)
           .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
           .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/login","/actuator/health/**","/actuator/info",
+            .requestMatchers("/auth/login","/v1/trades/stream","/actuator/health/**","/actuator/info",
                              "/actuator/prometheus","/swagger-ui.html","/swagger-ui/**",
                              "/v3/api-docs/**","/h2/**").permitAll()
             .requestMatchers("/actuator/**").hasAnyRole("VIEWER","TRADER","RECON_ANALYST","ADMIN")
